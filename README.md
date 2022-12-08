@@ -19,10 +19,26 @@ The GT911 config can be read and written too but make sure you check the docs fo
 #include <GT911.h>
 
 GT911 ts = GT911();
+#define I2C_SDA_PIN 8
+#define I2C_SCL_PIN 9
+#define TP_INT_PIN  0
+#define TP_RESET_PIN -1
+#define I2C_CLOCK   400000L
 
 void setup() {
   Serial.begin(115200);
-  ts.begin();
+
+  Wire.begin(I2C_SDA_PIN, I2C_SCL_PIN, I2C_CLOCK);
+  Wire.beginTransmission(GT911_I2C_ADDR_28);
+  byte error = Wire.endTransmission();
+  ts.reset();
+  if (error == 0) {
+    ts.begin(TP_INT_PIN, TP_RESET_PIN, GT911_I2C_ADDR_28); //0x14
+    Serial.println("Touch GT911 Address : 0x14");
+  } else {
+    ts.begin(TP_INT_PIN, TP_RESET_PIN, GT911_I2C_ADDR_BA); //0x5D
+    Serial.println("Touch GT911 Address : 0x5D");
+  }
 }
 
 void loop() {
