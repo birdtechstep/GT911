@@ -44,6 +44,7 @@ class GT911 {
 
     Rotate _rotation = Rotate::_0;
 
+    //void reset();
     void i2cStart(uint16_t reg);
     bool write(uint16_t reg, uint8_t data);
     uint8_t read(uint16_t reg);
@@ -65,9 +66,9 @@ class GT911 {
     uint8_t touched(uint8_t mode = GT911_MODE_INTERRUPT);
     GTPoint getPoint(uint8_t num);
     GTPoint *getPoints();
-    void reset();
 
     void setRotation(Rotate rotation);
+	void reset();
 };
 
 #endif

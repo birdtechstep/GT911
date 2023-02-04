@@ -148,13 +148,13 @@ bool GT911::begin(int8_t intPin, int8_t rstPin, uint8_t addr, uint32_t clk) {
   _rstPin = rstPin;
   _addr = addr;
 
-  if (_rstPin > 0) {
+  if (_rstPin >= 0) {
     delay(300);
     reset();
     delay(200);
   }
 
-  if (intPin > 0) {
+  if (intPin >= 0) {
     pinMode(_intPin, INPUT);
     attachInterrupt(_intPin, _gt911_irq_handler, FALLING);
   }
