@@ -43,7 +43,8 @@ void GT911::reset() {
 
   delay(11);
 
-  digitalWrite(_intPin, _addr == GT911_I2C_ADDR_28);
+  //digitalWrite(_intPin, _addr == GT911_I2C_ADDR_28);
+  digitalWrite(_intPin, _addr == GT911_I2C_ADDR_BA);
 
   delayMicroseconds(110);
   pinMode(_rstPin, INPUT);
@@ -79,7 +80,7 @@ uint8_t GT911::read(uint16_t reg) {
 bool GT911::writeBytes(uint16_t reg, uint8_t *data, uint16_t size) {
   i2cStart(reg);
   for (uint16_t i = 0; i < size; i++) {
-    _wire->write(data[i]);
+      _wire->write(data[i]);
   }
   return _wire->endTransmission() == 0;
 }
@@ -98,7 +99,7 @@ bool GT911::readBytes(uint16_t reg, uint8_t *data, uint16_t size) {
     index++;
   }
 
-  return size == index - 1;
+  return size == index;
 }
 
 uint8_t GT911::calcChecksum(uint8_t *buf, uint8_t len) {
@@ -129,18 +130,7 @@ int8_t GT911::readTouches() {
 }
 
 bool GT911::readTouchPoints() {
-  bool result = readBytes(GT911_REG_COORD_ADDR + 1, (uint8_t*)_points, sizeof(GTPoint) * GT911_MAX_CONTACTS);
-
-  if (result && _rotation != Rotate::_0) {
-    for (uint8_t i = 0; i < GT911_MAX_CONTACTS; i++) {
-      if (_rotation == Rotate::_180) {
-        _points[i].x = _info.xResolution - _points[i].x;
-        _points[i].y = _info.yResolution - _points[i].y;
-      }
-    }
-  }
-
-  return result;
+  return readBytes(GT911_REG_COORD_ADDR + 1, (uint8_t*)_points, sizeof(GTPoint) * GT911_MAX_CONTACTS);
 }
 
 bool GT911::begin(int8_t intPin, int8_t rstPin, uint8_t addr, uint32_t clk) {
@@ -148,25 +138,21 @@ bool GT911::begin(int8_t intPin, int8_t rstPin, uint8_t addr, uint32_t clk) {
   _rstPin = rstPin;
   _addr = addr;
 
-  if (_rstPin >= 0) {
+  if (_rstPin > 0) {
     delay(300);
     reset();
     delay(200);
   }
 
-  if (intPin >= 0) {
+  if (intPin > 0) {
     pinMode(_intPin, INPUT);
     attachInterrupt(_intPin, _gt911_irq_handler, FALLING);
   }
 
-  _wire->begin();
   _wire->setClock(clk);
+  _wire->begin();
   _wire->beginTransmission(_addr);
-  if (_wire->endTransmission() == 0) {
-    readInfo(); // Need to get resolution to use rotation
-    return true;
-  }
-  return false;
+  return _wire->endTransmission() == 0;
 }
 
 bool GT911::productID(uint8_t *buf, uint8_t len) {
@@ -234,8 +220,4 @@ GTPoint GT911::getPoint(uint8_t num) {
 
 GTPoint *GT911::getPoints() {
   return _points;
-}
-
-void GT911::setRotation(Rotate rotation) {
-  _rotation = rotation;
 }

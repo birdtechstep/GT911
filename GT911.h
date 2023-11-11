@@ -6,16 +6,16 @@
 #include "GT911_Structs.h"
 
 // 0x28/0x29 (0x14 7bit)
-#define GT911_I2C_ADDR_28  0x14
+#define GT911_I2C_ADDR_28    0x14
 // 0xBA/0xBB (0x5D 7bit)
-#define GT911_I2C_ADDR_BA  0x5D
+#define GT911_I2C_ADDR_BA    0x5D
 
-#define GT911_MAX_CONTACTS 5
+#define GT911_MAX_CONTACTS   5
 
-#define GT911_REG_CFG 0x8047
-#define GT911_REG_CHECKSUM 0x80FF
-#define GT911_REG_DATA 0x8140
-#define GT911_REG_ID 0x8140
+#define GT911_REG_CFG        0x8047
+#define GT911_REG_CHECKSUM   0x80FF
+#define GT911_REG_DATA       0x8140
+#define GT911_REG_ID         0x8140
 #define GT911_REG_COORD_ADDR 0x814E
 
 enum : uint8_t {
@@ -24,17 +24,10 @@ enum : uint8_t {
 };
 
 class GT911 {
-  public:
-    enum class Rotate {
-      _0,
-      _90,
-      _180,
-      _270,
-    };
   private:
     TwoWire *_wire;
-    int8_t _intPin;
-    int8_t _rstPin;
+    uint8_t _intPin;
+    uint8_t _rstPin;
     uint8_t _addr;
 
     bool _configLoaded = false;
@@ -42,9 +35,6 @@ class GT911 {
     GTInfo _info;
     GTPoint _points[GT911_MAX_CONTACTS];
 
-    Rotate _rotation = Rotate::_0;
-
-    //void reset();
     void i2cStart(uint16_t reg);
     bool write(uint16_t reg, uint8_t data);
     uint8_t read(uint16_t reg);
@@ -66,9 +56,7 @@ class GT911 {
     uint8_t touched(uint8_t mode = GT911_MODE_INTERRUPT);
     GTPoint getPoint(uint8_t num);
     GTPoint *getPoints();
-
-    void setRotation(Rotate rotation);
-	void reset();
+    void reset();
 };
 
 #endif
